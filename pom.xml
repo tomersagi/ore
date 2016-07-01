@@ -7,27 +7,7 @@
     <groupId>ac.technion.schemamatching</groupId>
     <artifactId>ore</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <repositories>
-		<repository>
-        	<id>extarnal.repo</id>
-        	<name>Remote Repository</name>
-        	<url>https://github.com/tomersagi/ore/tree/master/lib</url>
-		</repository>
-		<repository>
-       		<id>local.repo</id>
-       		<url>file://${project.build.directory}/lib</url>
-		</repository>
-	</repositories>
     <build>
-    	<pluginManagement>
-      		<plugins>
-        		<plugin>
-          			<groupId>org.apache.maven.plugins</groupId>
-          			<artifactId>maven-install-plugin</artifactId>
-          		<version>2.5.2</version>
-        	</plugin>
-      		</plugins>
-    	</pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -37,27 +17,6 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
-            
-<!--             <plugin> -->
-<!--     			<groupId>org.apache.maven.plugins</groupId> -->
-<!--     			<artifactId>maven-install-plugin</artifactId> -->
-<!--                 <executions> -->
-<!--                 	<execution> -->
-<!--                 		<id>1</id> -->
-<!--                 		<phase>install</phase> -->
-<!--                 		<goals> -->
-<!--                 			<goal>install-file</goal> -->
-<!--             			</goals> -->
-<!--             			<configuration> -->
-<!-- 							<file>local.repo/ontobuilder.matching.jar</file> -->
-<!-- 							<groupId>ac.technion.schemamatching</groupId> -->
-<!-- 							<artifactId>ob-matching</artifactId>  -->
-<!-- 							<version>1.0-SNAPSHOT</version> -->
-<!-- 							<packaging>jar</packaging> -->
-<!--                 		</configuration> -->
-<!--                 	</execution> -->
-<!--                 </executions> -->
-<!--             </plugin> -->
         </plugins>
     </build>
     <dependencies>
@@ -86,16 +45,22 @@
             <groupId>ac.technion.schemamatching</groupId>
             <artifactId>ob-io</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <scope>system</scope>
+    		<systemPath>${project.basedir}/lib/ontobuilder.io.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>ac.technion.schemamatching</groupId>
             <artifactId>SMB</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <scope>system</scope>
+    		<systemPath>${project.basedir}/lib/SMB.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>ac.technion.schemamatching</groupId>
             <artifactId>DBInterface</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <scope>system</scope>
+    		<systemPath>${project.basedir}/lib/DBInterface.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.github.gyulalaszlo</groupId>
@@ -106,11 +71,15 @@
             <groupId>com.sap.research</groupId>
             <artifactId>AMC-CLI</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <scope>system</scope>
+    		<systemPath>${project.basedir}/lib/amc_cli.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>eu.nisb</groupId>
             <artifactId>DataManagementLayer</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <scope>system</scope>
+    		<systemPath>${project.basedir}/lib/DataManagementLayer.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.googlecode.json-simple</groupId>
@@ -121,11 +90,22 @@
             <groupId>rita</groupId>
             <artifactId>core</artifactId>
             <version>2016</version>
+            <scope>system</scope>
+    		<systemPath>${project.basedir}/lib/rita-latest.jar</systemPath>
         </dependency>
+<!--         <dependency> -->
+<!--             <groupId>org.jbpt</groupId> -->
+<!--             <artifactId>jbpt-core</artifactId> -->
+<!--             <version>0.2.393</version> -->
+<!--             <scope>system</scope> -->
+<!--     		<systemPath>${project.basedir}/lib/jbpt-core.jar</systemPath> -->
+<!--         </dependency> -->
         <dependency>
             <groupId>org.jbpt</groupId>
-            <artifactId>jbpt-core</artifactId>
-            <version>0.2.393</version>
+            <artifactId>jbpt</artifactId>
+            <version>00.2.314</version>
+            <scope>system</scope>
+    		<systemPath>${project.basedir}/lib/jbpt-0.2.314.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.sun.xsom</groupId>
@@ -148,15 +128,24 @@
             <version>2.0.6</version>
         </dependency>
         <dependency>
-            <groupId>org.jbpt</groupId>
-            <artifactId>jbpt-petri</artifactId>
-            <version>0.2.393</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jbpt</groupId>
-            <artifactId>jbpt-bp</artifactId>
-            <version>0.2.393</version>
-        </dependency>
+    		<groupId>net.sourceforge.owlapi</groupId>
+   			<artifactId>owlapi-distribution</artifactId>
+    		<version>3.4.5</version>
+		</dependency>
+<!--         <dependency> -->
+<!--             <groupId>org.jbpt</groupId> -->
+<!--             <artifactId>jbpt-petri</artifactId> -->
+<!--             <version>0.2.393</version> -->
+<!--             <scope>system</scope> -->
+<!--     		<systemPath>${project.basedir}/lib/jbpt-petri.jar</systemPath> -->
+<!--         </dependency> -->
+<!--         <dependency> -->
+<!--             <groupId>org.jbpt</groupId> -->
+<!--             <artifactId>jbpt-bp</artifactId> -->
+<!--             <version>0.2.393</version> -->
+<!--             <scope>system</scope> -->
+<!--     		<systemPath>${project.basedir}/lib/jbpt-bp.jar</systemPath> -->
+<!--         </dependency> -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -186,11 +175,20 @@
             <groupId>de.wdilab</groupId>
             <artifactId>coma-engine</artifactId>
             <version>0.1-CE-SNAPSHOT</version>
+            <scope>system</scope>
+    		<systemPath>${project.basedir}/lib/coma.engine.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>de.wdilab</groupId>
             <artifactId>sem-rep</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <scope>system</scope>
+    		<systemPath>${project.basedir}/lib/semrep.jar</systemPath>
         </dependency>
+        <dependency>
+    		<groupId>mysql</groupId>
+   		    <artifactId>mysql-connector-java</artifactId>
+    		<version>5.1.10</version>
+		</dependency>
     </dependencies>
 </project>

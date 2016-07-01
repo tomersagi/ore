@@ -7,7 +7,27 @@
     <groupId>ac.technion.schemamatching</groupId>
     <artifactId>ore</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <repositories>
+		<repository>
+        	<id>extarnal.repo</id>
+        	<name>Remote Repository</name>
+        	<url>https://github.com/tomersagi/ore/tree/master/lib</url>
+		</repository>
+		<repository>
+       		<id>local.repo</id>
+       		<url>file://${project.build.directory}/lib</url>
+		</repository>
+	</repositories>
     <build>
+    	<pluginManagement>
+      		<plugins>
+        		<plugin>
+          			<groupId>org.apache.maven.plugins</groupId>
+          			<artifactId>maven-install-plugin</artifactId>
+          		<version>2.5.2</version>
+        	</plugin>
+      		</plugins>
+    	</pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -17,9 +37,29 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
+            
+<!--             <plugin> -->
+<!--     			<groupId>org.apache.maven.plugins</groupId> -->
+<!--     			<artifactId>maven-install-plugin</artifactId> -->
+<!--                 <executions> -->
+<!--                 	<execution> -->
+<!--                 		<id>1</id> -->
+<!--                 		<phase>install</phase> -->
+<!--                 		<goals> -->
+<!--                 			<goal>install-file</goal> -->
+<!--             			</goals> -->
+<!--             			<configuration> -->
+<!-- 							<file>local.repo/ontobuilder.matching.jar</file> -->
+<!-- 							<groupId>ac.technion.schemamatching</groupId> -->
+<!-- 							<artifactId>ob-matching</artifactId>  -->
+<!-- 							<version>1.0-SNAPSHOT</version> -->
+<!-- 							<packaging>jar</packaging> -->
+<!--                 		</configuration> -->
+<!--                 	</execution> -->
+<!--                 </executions> -->
+<!--             </plugin> -->
         </plugins>
     </build>
-
     <dependencies>
         <dependency>
             <groupId>ac.technion.schemamatching</groupId>
@@ -30,11 +70,15 @@
             <groupId>ac.technion.schemamatching</groupId>
             <artifactId>cesm</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <scope>system</scope>
+    		<systemPath>${project.basedir}/lib/cesm.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>ac.technion.schemamatching</groupId>
             <artifactId>ob-matching</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <scope>system</scope>
+    		<systemPath>${project.basedir}/lib/ontobuilder.matching.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>ac.technion.schemamatching</groupId>

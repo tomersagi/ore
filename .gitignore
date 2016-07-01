@@ -1,3 +1,6 @@
+lib/amc_cli.jar
+target
+
 *.class
 
 # Mobile Tools for Java (J2ME)

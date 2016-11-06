@@ -18,6 +18,7 @@ import ac.technion.iem.ontobuilder.io.matchimport.NativeMatchImporter;
 import ac.technion.iem.ontobuilder.io.matchimport.PNMLPairMatchImporter;
 import ac.technion.iem.ontobuilder.io.matchimport.RDFMatchImporter;
 //import ac.technion.iem.ontobuilder.io.imports.RDFImporter;
+import ac.technion.schemamatching.processinstancematching.XESImporter;
 
 
 /**
@@ -51,8 +52,10 @@ public enum OREDataSetEnum
 	PNML(24,"Petri-Net Represented Business Processes", new PNMLImporter(), new PNMLPairMatchImporter(),true, false, false),
 	RealEstate(25,"Real Estate XSD and XML with instances",new XSDImporterUsingXSOM(),new CSVMatchImporter(),true, false, true),
 	Orders(26,"Orders XSD and XML with instances",new XSDImporterUsingXSOM(),new CSVMatchImporter(),true, false, true),
-	Articles(27,"Articles XSD and XML with instances",new XSDImporterUsingXSOM(),new CSVMatchImporter(),true, false, true)
+	Articles(27,"Articles XSD and XML with instances",new XSDImporterUsingXSOM(),new CSVMatchImporter(),true, false, true),
+	BPIC(28,"Business process XES event logs ", new XESImporter(), new PNMLPairMatchImporter(),true, false, false)
 	;//Lod(25, "Linked open data - rdf", new RDFImporter(),new MappingMatchImporter(),true, false, false);
+
 	/**
 	 * Get a OREDataSetEnum by it's dataset id in O(n)
 	 * @param dsid

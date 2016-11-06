@@ -160,6 +160,8 @@
             <groupId>nl.tue.is</groupId>
             <artifactId>processMatchingTools</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <scope>system</scope>
+    		<systemPath>${project.basedir}/lib/processMatchingTools.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>de.sciss</groupId>
@@ -190,5 +192,20 @@
    		    <artifactId>mysql-connector-java</artifactId>
     		<version>5.1.10</version>
 		</dependency>
+	<dependency>
+		<groupId>org.deckfour</groupId>
+		<artifactId>log</artifactId>
+		<version>0.1-CE-SNAPSHOT</version>
+		<scope>system</scope>
+		<systemPath>${project.basedir}/lib/Log.jar</systemPath>
+	</dependency>
+		<dependency>
+		<groupId>org.deckfour</groupId>
+		<artifactId>xes</artifactId>
+		<version>0.1-CE-SNAPSHOT</version>
+		<scope>system</scope>
+		<systemPath>${project.basedir}/lib/OpenXES.jar</systemPath>
+	</dependency>
     </dependencies>
+
 </project>

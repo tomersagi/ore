@@ -1,19 +1,31 @@
 package ac.technion.schemamatching.experiments.pairwise;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Properties;
+
+import ac.technion.iem.ontobuilder.matching.match.Match;
 import ac.technion.iem.ontobuilder.matching.match.MatchInformation;
 import ac.technion.schemamatching.experiments.OBExperimentRunner;
 import ac.technion.schemamatching.matchers.firstline.FirstLineMatcher;
 import ac.technion.schemamatching.matchers.secondline.OBCrossEntropy;
 import ac.technion.schemamatching.matchers.secondline.OBCrossEntropy.OBCrossEntropyResult;
+import ac.technion.schemamatching.matchers.secondline.SLMList;
 import ac.technion.schemamatching.matchers.secondline.SecondLineMatcher;
-import ac.technion.schemamatching.statistics.*;
+import ac.technion.schemamatching.statistics.BinaryGolden;
+import ac.technion.schemamatching.statistics.K2Statistic;
+import ac.technion.schemamatching.statistics.MCC;
+import ac.technion.schemamatching.statistics.MatchDistance;
+import ac.technion.schemamatching.statistics.NBGolden;
+import ac.technion.schemamatching.statistics.NBGoldenAtDynamicK;
+import ac.technion.schemamatching.statistics.NBGoldenAtK;
+import ac.technion.schemamatching.statistics.NBGoldenAtR;
+import ac.technion.schemamatching.statistics.NumIterations;
+import ac.technion.schemamatching.statistics.Statistic;
+import ac.technion.schemamatching.statistics.VerboseBinaryGolden;
 import ac.technion.schemamatching.testbed.ExperimentSchemaPair;
 import ac.technion.schemamatching.util.ConversionUtils;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Properties;
 
 /**
  * This simple match experiment is intended as a tutorial for 
@@ -47,10 +59,11 @@ class SimpleMatchExperimentVerboseNew implements PairWiseExperiment {
 			/*Preferred method is to use this method which looks up 
 			 * the similarity matrix in the database if it exists. 
 			*/
+			isMemory = false;
 			mi = esp.getSimilarityMatrix(m,isMemory);
 			
 			ConversionUtils.zeroWeightsByThresholdAndRemoveMatches(mi, 0.01);
-			ConversionUtils.limitToKMatches(mi, 10);
+//			ConversionUtils.limitToKMatches(mi, 10);
 			
 			//Calculate Non-Binary Precision and Recall
 			K2Statistic nb = new NBGolden();
@@ -78,36 +91,40 @@ class SimpleMatchExperimentVerboseNew implements PairWiseExperiment {
 			md.init(instanceDesc, mi,esp.getExact());
 			evaluations.add(md);
 			
-			//selecting second line matchers to use
-			ArrayList<SecondLineMatcher> slm_to_use= new ArrayList<>();
-		/*	slm_to_use.add(SLMList.OBMWBG.getSLM());
-			slm_to_use.add(SLMList.OBMaxDelta01.getSLM());
-			slm_to_use.add(SLMList.OBThreshold085.getSLM());
-			slm_to_use.add(SLMList.OBDom.getSLM());
-			slm_to_use.add(SLMList.OBSM.getSLM());*/
-		
-			//CESM properties
-			Properties pMap = new Properties();
-			try {
-				pMap.load(new FileInputStream("oreConfig/CESM_parameters.properties"));
-			} catch (IOException e) {
-				e.printStackTrace();
+			for (Match match : mi.getCopyOfMatches()) {
+				String cs = match.getCandidateTerm().getName();
+				String ts = match.getTargetTerm().getName();
+				double conf = match.getEffectiveness();
+				int i = 5;
 			}
 			
-			
-			OBCrossEntropy obce = new OBCrossEntropy();
-			obce.init(pMap);
-			System.out.println(obce.getConfig());
-			slm_to_use.add(obce);
+			//selecting second line matchers to use
+			ArrayList<SecondLineMatcher> slm_to_use= new ArrayList<>();
+
+//			slm_to_use.add(SLMList.OBMWBG.getSLM());
+//			slm_to_use.add(SLMList.OBMaxDelta01.getSLM());
+			slm_to_use.add(SLMList.OBThreshold085.getSLM());
+//			slm_to_use.add(SLMList.OBDom.getSLM());
+//			slm_to_use.add(SLMList.OBSM.getSLM());
+		
+			//CESM properties
+//			Properties pMap = new Properties();
+//			try {
+//				pMap.load(new FileInputStream("oreConfig/CESM_parameters.properties"));
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//			
+//			
+//			OBCrossEntropy obce = new OBCrossEntropy();
+//			obce.init(pMap);
+//			System.out.println(obce.getConfig());
+//			slm_to_use.add(obce);
 			Boolean Flag;
 			for (SecondLineMatcher s : slm_to_use)
 			{
 				//Second Line Match
-				if (properties == null || !s.init(properties)) 
-					System.err.println("Initialization of " + s.getName() + 
-							"failed, we hope the author defined default values...");
 				MatchInformation mi1 = s.match(mi);
-				Flag = s.getName().equals("Ontobuilder CrossEntropy");
 				//calculate Precision and Recall
 				K2Statistic b2 = new BinaryGolden();
 				instanceDesc =  esp.getID() + "," + m.getName() + "," + s.getName()+ "," + s.getConfig();
@@ -127,20 +144,20 @@ class SimpleMatchExperimentVerboseNew implements PairWiseExperiment {
 				mcc.init(instanceDesc, mi1,esp.getExact());
 				evaluations.add(mcc);
 				//Calculate NumIterations
-				if (Flag)
-				{
-					NumIterations ni1 = new NumIterations();
-					OBCrossEntropyResult result = obce.getOBCrossEntropyResult();
-					int numCEIterations = result.numIterations;
-					long timeCEIterations = result.time;
-					double Objective= result.getOptimalObjectiveValue();
-					int Numcands= result.getNumCands();
-					int Numtargets= result.getNumTargets();
-					int Matrixdim=result.getMatrixDim();
-					ni1.addNumOfIter(numCEIterations,timeCEIterations,Objective,Numcands,Numtargets,Matrixdim);
-					ni1.init(instanceDesc, mi1);
-					evaluations.add(ni1);	
-				}
+//				if (Flag)
+//				{
+//					NumIterations ni1 = new NumIterations();
+//					OBCrossEntropyResult result = obce.getOBCrossEntropyResult();
+//					int numCEIterations = result.numIterations;
+//					long timeCEIterations = result.time;
+//					double Objective= result.getOptimalObjectiveValue();
+//					int Numcands= result.getNumCands();
+//					int Numtargets= result.getNumTargets();
+//					int Matrixdim=result.getMatrixDim();
+//					ni1.addNumOfIter(numCEIterations,timeCEIterations,Objective,Numcands,Numtargets,Matrixdim);
+//					ni1.init(instanceDesc, mi1);
+//					evaluations.add(ni1);	
+//				}
 			}
 		}
 		return evaluations;

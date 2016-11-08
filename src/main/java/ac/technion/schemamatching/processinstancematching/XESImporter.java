@@ -4,10 +4,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.zip.ZipFile;
 
 import org.deckfour.xes.extension.std.XConceptExtension;
 import org.deckfour.xes.factory.XFactory;
@@ -20,8 +23,6 @@ import org.deckfour.xes.model.XAttribute;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
-import org.jbpt.petri.NetSystem;
-import org.jbpt.petri.Transition;
 import org.processmining.log.utils.XUtils;
 
 import ac.technion.iem.ontobuilder.core.ontology.Attribute;
@@ -35,8 +36,12 @@ import ac.technion.iem.ontobuilder.io.imports.Importer;
 
 public class XESImporter implements Importer {
 
-	private Ontology ontology;
+	public static List<String> HIDE_ATTRIBUTES = Arrays.asList(
+			new String[]{"concept:name", "activityNameEN", "activityNameNL", "action_code"});
 	
+	public static boolean FILTER_SUBPROCESS = true;
+	
+	private Ontology ontology;
 	
 	@Override
 	public Ontology importFile(File file) throws ImportException {
@@ -50,109 +55,59 @@ public class XESImporter implements Importer {
 		
 		File file = modelFile;
 		ontology = new Ontology(file.getName().substring(0, file.getName().length()-4));
+		ontology.setLight(true);
 		XLog log = importXLog(file);
 		
+		System.out.println("successfully loaded log for " + file.getAbsolutePath());
 		createOntology(log);
 		
-		addInstanceInformation(log);
+		System.out.println("ontology created");
+		
+//		addInstanceInformation(log);
 		
 		return ontology;
 		
 	}
 
 	private void createOntology(XLog log) {
+		XESOverviewModel model = new XESOverviewModel();
+		
+		for (XTrace trace : log) {
+			for (XEvent event : trace) {
+				String eventClass = XConceptExtension.instance().extractName(event);
+				model.addEventClass(eventClass);
+				for (XAttribute attr : event.getAttributes().values()) {
+					String attrName = attr.getKey();
+					Object val = XUtils.getAttributeValue(attr);
+					model.addAttributeValue(eventClass, attrName, val);
+				}
+			}
+		}
+		
 		OntologyClass eventClassClass = new OntologyClass("eventClass");
 		ontology.addClass(eventClassClass);
 		
-		for (String eventClass : getEventClasses(log)) {
+		for (String eventClass : model.getEventClasses()) {
+			if (FILTER_SUBPROCESS && !eventClass.subSequence(0, 2).equals("01")) {
+				continue;
+			}
 			Term term = new Term(eventClass, eventClass);
 			ontology.addTerm(term);
-			term.setSuperClass(eventClassClass);
-			for (String attrName : getAttributeClasses(log, eventClass)) {
-				Attribute attribute = new Attribute(attrName, attrName);
-				term.addAttribute(attribute);
-				attribute.getDomain().setType(getAttributeType(log, eventClass, attrName));
-			}
-		}
-	}
-	
-	private void addInstanceInformation(XLog log) {
-		//Create domains
-		for (Term t : ontology.getTerms(false)) {
-			for (Attribute attr : t.getAttributes()) {
-				Domain d = attr.getDomain();
-				for (Object o : getAttributeValues(log, t.getName(), attr.getName())) {
-					d.addEntry(new DomainEntry(d, o));
-				}
-			}
-		}
-	}
-	
-	
-	public Set<String> getEventClasses(XLog log) {
-		Set<String> res = new HashSet<String>();
-		for (XTrace t : log) {
-			for (XEvent e : t) {
-				String eClass = XConceptExtension.instance().extractName(e);
-				res.add(eClass);
-			}
-		}
-		return res;
-	}
-	
-	public Set<String> getAttributeClasses(XLog log, String eventClass) {
-		Set<String> res = new HashSet<String>();
-		for (XTrace t : log) {
-			for (XEvent e : t) {
-				String eClass = XConceptExtension.instance().extractName(e);
-				if (eClass.equals(eventClass)) {
-					for (XAttribute a : e.getAttributes().values()) {
-						res.add(XConceptExtension.instance().extractName(a));
+//			term.setSuperClass(eventClassClass);
+			for (String attrName : model.getEventAttributes(eventClass)) {
+				if (!HIDE_ATTRIBUTES.contains(attrName)) {
+					Attribute attribute = new Attribute(attrName, attrName);
+					term.addAttribute(attribute);
+					Domain domain = attribute.getDomain();
+					for (Object attrValue : model.getAttributeValues(eventClass, attrName)) {
+						domain.addEntry(new DomainEntry(domain, attrValue));
 					}
 				}
 			}
 		}
-		return res;
+//		XESModelWriter.writeXESModel(ontology.getName(), model);
 	}
-	
-	public Set<Object> getAttributeValues(XLog log, String eventClass, String attributeName) {
-		Set<Object> res = new HashSet<Object>();
-		for (XTrace t : log) {
-			for (XEvent e : t) {
-				String eClass = XConceptExtension.instance().extractName(e);
-				if (eClass.equals(eventClass)) {
-					if (e.getAttributes().containsKey(attributeName)) {
-						res.add(XUtils.getAttributeValue(e.getAttributes().get(attributeName)));
-					}
-				}
-			}
-		}
-		return res;
-	}
-	
-	public String getAttributeType(XLog log, String eventClass, String attributeName) {
-		for (XTrace t : log) {
-			for (XEvent e : t) {
-				String eClass = XConceptExtension.instance().extractName(e);
-				if (eClass.equals(eventClass)) {
-					if (e.getAttributes().containsKey(attributeName)) {
-						Class<?> c = XUtils.getAttributeClass(e.getAttributes().get(attributeName));
-						return convertClassToOREDomainType(c);
-					}
-				}
-			}
-		}
-		return "unknown domain type";
-	}
-	
-	private String convertClassToOREDomainType(Class<?> c) {
-		//TODO: do we need to do this or can we use a sniffer? sniffers could be more specific, since java classes cannot express e.g. if string is an email etc
-		switch (c.getName()) {
-		case "String": return "ontology.domain.text";
-		case "Boolean": return "ontology.domain.boolean";
-		default: return "unknown domain type";
-		}	
-	}
+
 	
 	
 	private XLog importXLog(File file) throws ImportException {

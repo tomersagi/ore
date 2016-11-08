@@ -22,7 +22,8 @@ public enum FLMList {AMCDataType(new AMCDataType()),AMCName(new AMCName())
 	ProcessModel(new ProcessModelFLM())
 	,OBTED(new OBTEDGraphMatch())
 	,ContentBasedMatcher(new ContentBasedMatcher())
-	,SemRep(new SemRepMatcher()),SatMatch(new SATMatcher()), OurWN(new OurWordnet());
+	,SemRep(new SemRepMatcher()),SatMatch(new SATMatcher()), OurWN(new OurWordnet())
+	,ProcessInstance(new ProcessInstanceMatcher());
 
 private FLMList(FirstLineMatcher flm)
 {

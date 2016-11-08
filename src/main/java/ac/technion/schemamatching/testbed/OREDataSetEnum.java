@@ -53,7 +53,7 @@ public enum OREDataSetEnum
 	RealEstate(25,"Real Estate XSD and XML with instances",new XSDImporterUsingXSOM(),new CSVMatchImporter(),true, false, true),
 	Orders(26,"Orders XSD and XML with instances",new XSDImporterUsingXSOM(),new CSVMatchImporter(),true, false, true),
 	Articles(27,"Articles XSD and XML with instances",new XSDImporterUsingXSOM(),new CSVMatchImporter(),true, false, true),
-	BPIC(28,"Business process XES event logs ", new XESImporter(), new PNMLPairMatchImporter(),true, false, false)
+	BPIC(28,"Business process XES event logs ", new XESImporter(), new CSVMatchImporter(), true, false, false)
 	;//Lod(25, "Linked open data - rdf", new RDFImporter(),new MappingMatchImporter(),true, false, false);
 
 	/**

@@ -42,6 +42,7 @@ public enum PairExperimentEnum
 	, Cartesian ( new NBTuningCartesianProduct())
 	, CsharpExp( new CsharpExp()), PredictorCsharp(new PredictorCsharp()), CartesianTest (new NBTuningTermTest())
 	, Human2LM (new Behavioral2LMensemble())
+	, ProcessInstance(new SimpleMatchExperimentVerboseNew())
 	;
 
 	private PairExperimentEnum(PairWiseExperiment e)

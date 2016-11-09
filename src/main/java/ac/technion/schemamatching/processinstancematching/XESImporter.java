@@ -6,11 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.deckfour.xes.extension.std.XConceptExtension;
 import org.deckfour.xes.factory.XFactory;
@@ -19,18 +15,11 @@ import org.deckfour.xes.in.XMxmlParser;
 import org.deckfour.xes.in.XParser;
 import org.deckfour.xes.in.XParserRegistry;
 import org.deckfour.xes.in.XesXmlParser;
-import org.deckfour.xes.model.XAttribute;
-import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
-import org.processmining.log.utils.XUtils;
 
-import ac.technion.iem.ontobuilder.core.ontology.Attribute;
-import ac.technion.iem.ontobuilder.core.ontology.Domain;
-import ac.technion.iem.ontobuilder.core.ontology.DomainEntry;
 import ac.technion.iem.ontobuilder.core.ontology.Ontology;
 import ac.technion.iem.ontobuilder.core.ontology.OntologyClass;
-import ac.technion.iem.ontobuilder.core.ontology.Term;
 import ac.technion.iem.ontobuilder.io.imports.ImportException;
 import ac.technion.iem.ontobuilder.io.imports.Importer;
 
@@ -63,53 +52,29 @@ public class XESImporter implements Importer {
 		
 		System.out.println("ontology created");
 		
-//		addInstanceInformation(log);
-		
 		return ontology;
 		
 	}
 
 	private void createOntology(XLog log) {
 		XESOverviewModel model = new XESOverviewModel();
-		
-		for (XTrace trace : log) {
-			for (XEvent event : trace) {
-				String eventClass = XConceptExtension.instance().extractName(event);
-				model.addEventClass(eventClass);
-				for (XAttribute attr : event.getAttributes().values()) {
-					String attrName = attr.getKey();
-					Object val = XUtils.getAttributeValue(attr);
-					model.addAttributeValue(eventClass, attrName, val);
-				}
-			}
-		}
+		model.populateModel(log, HIDE_ATTRIBUTES);
 		
 		OntologyClass eventClassClass = new OntologyClass("eventClass");
 		ontology.addClass(eventClassClass);
 		
-		for (String eventClass : model.getEventClasses()) {
-			if (FILTER_SUBPROCESS && !eventClass.subSequence(0, 2).equals("01")) {
+		for (XESOverviewElement el : model.getEventClasses()) {
+			if (FILTER_SUBPROCESS && !el.getName().subSequence(0, 2).equals("01")) {
 				continue;
 			}
-			Term term = new Term(eventClass, eventClass);
-			ontology.addTerm(term);
-//			term.setSuperClass(eventClassClass);
-			for (String attrName : model.getEventAttributes(eventClass)) {
-				if (!HIDE_ATTRIBUTES.contains(attrName)) {
-					Attribute attribute = new Attribute(attrName, attrName);
-					term.addAttribute(attribute);
-					Domain domain = attribute.getDomain();
-					for (Object attrValue : model.getAttributeValues(eventClass, attrName)) {
-						domain.addEntry(new DomainEntry(domain, attrValue));
-					}
-				}
+			EventClass eventClassTerm = new EventClass(el);
+			ontology.addTerm(eventClassTerm);
+			
+			eventClassTerm.setSuperClass(eventClassClass);
 			}
-		}
 //		XESModelWriter.writeXESModel(ontology.getName(), model);
 	}
 
-	
-	
 	private XLog importXLog(File file) throws ImportException {
 		InputStream input;
 		try {

@@ -5,12 +5,6 @@
  */
 package ac.technion.schemamatching.experiments;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,6 +31,8 @@ import ac.technion.schemamatching.testbed.ExperimentSchema;
 import ac.technion.schemamatching.testbed.ExperimentSchemaPair;
 import ac.technion.schemamatching.testbed.OREDataSetEnum;
 import ac.technion.schemamatching.util.PropertyLoader;
+import au.com.bytecode.opencsv.CSVWriter;
+
 import com.infomata.data.CSVFormat;
 import com.infomata.data.DataFile;
 import com.infomata.data.DataRow;
@@ -782,23 +778,48 @@ public class OBExperimentRunner {
 	 */
 	private void outputAsCSV(String[] header, ArrayList<String[]> data, File f)
 	{
-		DataFile write = new DataFileWriter("8859_1");
-		write.setDataFormat(new CSVFormat());
 		try {
-			write.open(f);
-
-			DataRow row = write.next();
-			for (int i=0;i<header.length;i++) row.add(header[i]);
-			for (int i=0;i<data.size();i++)
-			{
-				row = write.next();
-				String rRow[] = data.get(i);
-				for (int j=0;j<rRow.length;j++) row.add(rRow[j]);
+			CSVWriter writer = new CSVWriter(new FileWriter(f.getAbsolutePath(), false), ';');
+			
+			writer.writeNext(header);
+			for (String[] row : data) {
+				writer.writeNext(row);
 			}
-			write.close();
+			
+//			for (String eventClass : model.getEventClasses()) {
+//				for (String attrName : model.getEventAttributes(eventClass)) {
+//					List<Object> vals = model.getAttributeValues(eventClass, attrName);
+//					String[] line = new String[vals.size() + 2];
+//					line[0] = eventClass;
+//					line[1] = attrName;
+//					for (int i = 0; i < vals.size(); i++) {
+//						line[i + 2] = String.valueOf(vals.get(i));
+//					}
+//					writer.writeNext(line);
+//				}
+//			}
+			writer.close();
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+//		DataFile write = new DataFileWriter("8859_1");
+//		write.setDataFormat(new CSVFormat());
+//		try {
+//			write.open(f);
+//
+//			DataRow row = write.next();
+//			for (int i=0;i<header.length;i++) row.add(header[i]);
+//			for (int i=0;i<data.size();i++)
+//			{
+//				row = write.next();
+//				String rRow[] = data.get(i);
+//				for (int j=0;j<rRow.length;j++) row.add(rRow[j]);
+//			}
+//			write.close();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	public void setDsurl(String dsurl) {

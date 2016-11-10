@@ -21,11 +21,11 @@ public class XESOverviewModel {
 	XLog log;
 	private Map<String, Integer> attributeDictionary;
 	
-	private HashMap<String, XESOverviewElement> eventClassMap;
+	private HashMap<String, EventClass> eventClassMap;
 	Set<String> currentPrereqs;
 
 	public XESOverviewModel() {
-		eventClassMap = new HashMap<String, XESOverviewElement>();
+		eventClassMap = new HashMap<String, EventClass>();
 	}
 	
 	public void populateModel(XLog log, List<String> hiddenAttributes) {
@@ -41,17 +41,17 @@ public class XESOverviewModel {
 	public void addEvent(XTrace trace, int pos, List<String> hiddenAttributes) {
 		XEvent event = trace.get(pos);
 		String eventClass = XConceptExtension.instance().extractName(event);
-		XESOverviewElement el;
+		EventClass el;
 		if (!eventClassMap.containsKey(eventClass)) {
-			el = new XESOverviewElement(eventClass);
+			el = new EventClass(eventClass);
+			el.setId(eventClass.hashCode());
 			el.setTraces(log.size());
 			eventClassMap.put(eventClass, el);
 		} else {
 			el = eventClassMap.get(eventClass);
 		}
 		el.incrementFrequency();
-		el.addPrecedingNumber(pos - 1);
-		el.addSucceedingNumber(trace.size() - pos);
+		el.addRelPos((double) (pos + 1) / trace.size()); 
 		el.addPrereqs(currentPrereqs);
 		
 		if (pos > 0) {
@@ -60,7 +60,7 @@ public class XESOverviewModel {
 		
 		for (XAttribute attr : event.getAttributes().values()) {
 			String attrName = attr.getKey();
-			if (!hiddenAttributes.contains(attrName)) {
+			if (!hiddenAttributes.contains(attrName) && !attrName.startsWith("(case)")) {
 				Object val = XUtils.getAttributeValue(attr);
 				el.addAttributeValue(attrName, val);
 				currentPrereqs.add(attrName);
@@ -78,7 +78,7 @@ public class XESOverviewModel {
 		eventClassMap.get(eventClass).addAttributeValue(attribute, value);
 	}
 	
-	public Collection<XESOverviewElement> getEventClasses() {
+	public Collection<EventClass> getEventClasses() {
 		return eventClassMap.values();
 	}
 	

@@ -1,6 +1,13 @@
 package ac.technion.schemamatching.processinstancematching;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 import ac.technion.iem.ontobuilder.core.ontology.Attribute;
 import ac.technion.iem.ontobuilder.core.ontology.Domain;
@@ -9,66 +16,94 @@ import ac.technion.iem.ontobuilder.core.ontology.Term;
 
 public class EventClass extends Term {
 
-	protected double frequencyPerTrace;
-	protected double avgPreceedingEvents;
-	protected double avgSucceedingEvents;
-	protected Collection<String> mandatoryPrereqs;
-	protected Collection<String> optionalPrereqs;
+	int frequency;
+	int traces;
+	List<Double> pos;
+	double avgRelPos;
+	Set<String> mandatoryPrereqs;
+	Set<String> optionalPrereqs;
+	Set<String> allPrereqs;
+	SummaryStatistics timeDistrib;
+	Map<String, Attribute> attributeMap;
 	
+	public EventClass(String name) {
+		super(name);
+		pos = new ArrayList<Double>();
+		allPrereqs = new HashSet<String>();
+		mandatoryPrereqs = new HashSet<String>();
+		optionalPrereqs = new HashSet<String>();
+		timeDistrib = new SummaryStatistics();
+		attributeMap = new HashMap<String, Attribute>();
+		avgRelPos = -1;
+	}
 	
+	public void  setTraces(int n) {
+		this.traces = n;
+	}
 	
-	public EventClass(XESOverviewElement el) {
-		super(el.getName(), el.getName());
-
-		this.frequencyPerTrace = el.getFrequency();
-		this.avgPreceedingEvents = el.getAveragePreceding();
-		this.avgSucceedingEvents = el.getAverageSuceeding();
-
-		for (String attrName : el.getAttributeNames()) {
+	public void incrementFrequency() {
+		frequency++;
+	}
+	
+	public void addRelPos(double relPos) {
+		pos.add(relPos);
+	}
+	
+	public void addCycleTime(long ms) {
+		timeDistrib.addValue(ms);
+	}
+	
+	public SummaryStatistics getTimeDistribution() {
+		return timeDistrib;
+	}
+	
+	public void addAttributeValue(String attrName, Object val) {
+		if (!attributeMap.containsKey(attrName)) {
 			Attribute attribute = new Attribute(attrName, attrName);
+			attributeMap.put(attrName, attribute);
 			addAttribute(attribute);
-			Domain domain = attribute.getDomain();
-			for (Object attrValue : el.getAttributeValues(attrName)) {
-				domain.addEntry(new DomainEntry(domain, attrValue));
+		}
+		Domain d = attributeMap.get(attrName).getDomain();
+		d.addEntry(new DomainEntry(d, val));
+	}
+	
+	public double getFrequency() {
+		return (double) frequency / traces;
+	}
+	
+	public double getRelativePosition() {
+		if (avgRelPos > 0) {
+			return avgRelPos;
+		}
+		double sum = 0;
+		for (double d : pos) {
+			sum = sum + d;
+		}
+		avgRelPos = sum / pos.size(); 
+		return avgRelPos;
+	}
+
+	public String getName() {
+		return name;
+	}
+	
+	public void addPrereqs(Set<String> prereqs) {
+		allPrereqs.addAll(prereqs);
+		if (mandatoryPrereqs.isEmpty() && optionalPrereqs.isEmpty()) {
+			mandatoryPrereqs.addAll(prereqs);
+		} else {
+			Set<String> diff = new HashSet<String>(mandatoryPrereqs);
+			diff.removeAll(prereqs);
+			for (String attrName : diff) {
+				mandatoryPrereqs.remove(attrName);
+				optionalPrereqs.add(attrName);
 			}
 		}
 	}
-
-
-	public void setFrequency(double frequency) {
-		this.frequencyPerTrace = frequency;
-	}
-
-
-
-	public double getAvgPreceedingEvents() {
-		return avgPreceedingEvents;
-	}
-
-
-
-	public void setAvgPreceedingEvents(double avgPreceedingEvents) {
-		this.avgPreceedingEvents = avgPreceedingEvents;
-	}
-
-
-
-	public double getAvgSucceedingEvents() {
-		return avgSucceedingEvents;
-	}
-
-
-
-	public void setAvgSucceedingEvents(double avgSucceedingEvents) {
-		this.avgSucceedingEvents = avgSucceedingEvents;
-	}
-
-
-
-	public double getFrequency() {
-		return frequencyPerTrace;
-	}
 	
+	public Set<String> getPrereqs() {
+		return allPrereqs;
+	}
 	
 	
 }

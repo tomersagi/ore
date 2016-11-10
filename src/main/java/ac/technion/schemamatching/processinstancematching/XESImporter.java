@@ -28,7 +28,7 @@ public class XESImporter implements Importer {
 	public static List<String> HIDE_ATTRIBUTES = Arrays.asList(
 			new String[]{"concept:name", "activityNameEN", "activityNameNL", "action_code"});
 	
-	public static boolean FILTER_SUBPROCESS = true;
+	public static boolean FILTER_SUBPROCESS = false;
 	
 	private Ontology ontology;
 	
@@ -54,7 +54,7 @@ public class XESImporter implements Importer {
 		
 		return ontology;
 		
-	}
+	} 
 
 	private void createOntology(XLog log) {
 		XESOverviewModel model = new XESOverviewModel();
@@ -63,16 +63,15 @@ public class XESImporter implements Importer {
 		OntologyClass eventClassClass = new OntologyClass("eventClass");
 		ontology.addClass(eventClassClass);
 		
-		for (XESOverviewElement el : model.getEventClasses()) {
-			if (FILTER_SUBPROCESS && !el.getName().subSequence(0, 2).equals("01")) {
+		for (EventClass eventClass : model.getEventClasses()) {
+			if (FILTER_SUBPROCESS && 
+				!eventClass.getName().subSequence(0, 2).equals("12")) {
 				continue;
 			}
-			EventClass eventClassTerm = new EventClass(el);
-			ontology.addTerm(eventClassTerm);
+			ontology.addTerm(eventClass);
 			
-			eventClassTerm.setSuperClass(eventClassClass);
+			eventClass.setSuperClass(eventClassClass);
 			}
-//		XESModelWriter.writeXESModel(ontology.getName(), model);
 	}
 
 	private XLog importXLog(File file) throws ImportException {

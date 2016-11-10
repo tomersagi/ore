@@ -13,8 +13,10 @@ import java.util.Vector;
 import ac.technion.iem.ontobuilder.core.ontology.Attribute;
 import ac.technion.iem.ontobuilder.core.ontology.Ontology;
 import ac.technion.iem.ontobuilder.core.ontology.Term;
+import ac.technion.iem.ontobuilder.matching.algorithms.line1.domain.DomainAlgorithm;
 import ac.technion.iem.ontobuilder.matching.match.MatchInformation;
 import ac.technion.schemamatching.matchers.MatcherType;
+import ac.technion.schemamatching.processinstancematching.EventClass;
 
 /**
  * @author Han van der Aa
@@ -24,16 +26,30 @@ import ac.technion.schemamatching.matchers.MatcherType;
  */
 public class AttributeSetMatcher implements FirstLineMatcher {
 
-	private boolean useTFIDF;
-	private boolean considerDomains;
+	public enum ASMMode {
+		BASIC(1), TFIDF(2), DOMAIN(3), PREREQS(4);
+		
+		int value;
+		ASMMode(int value) {
+			this.value = value;
+		}
+		
+	}
 	
 	private Map<String, Integer> attributeDictionary;
 	private int documentCount;
 	private Map<String, Double> idfMap;
+	ASMMode mode;
+	boolean matchPrereqs = false;
 	
-	public AttributeSetMatcher(boolean useTFIDF, boolean considerDomains) {
-		this.useTFIDF = useTFIDF;
-		this.considerDomains = considerDomains;
+	
+	public AttributeSetMatcher(ASMMode mode) {
+		this.mode = mode;
+	}
+	
+	public AttributeSetMatcher(ASMMode mode, boolean matchPrereqs) {
+		this.mode = mode;
+		this.matchPrereqs = matchPrereqs;
 	}
 	
 	/* (non-Javadoc)
@@ -49,7 +65,7 @@ public class AttributeSetMatcher implements FirstLineMatcher {
 	 */
 	@Override
 	public String getConfig() {
-		return "tfidf: " + useTFIDF;
+		return "tfidf: " + mode.toString();
 	}
 
 	/* (non-Javadoc)
@@ -78,7 +94,7 @@ public class AttributeSetMatcher implements FirstLineMatcher {
 	public MatchInformation match(Ontology candidate, Ontology target,
 			boolean binary) {
 		
-		if (useTFIDF) {
+		if (mode != ASMMode.DOMAIN) {
 			populateDictionary(candidate, target);
 		}
 		
@@ -107,23 +123,23 @@ public class AttributeSetMatcher implements FirstLineMatcher {
 	 */
 	@Override
 	public int getDBid() {
-		return 250;
+		return 250 + mode.value ;
 	}
 	
 	private double computeConfidence(Term cTerm, Term tTerm) {
 		
-		if (!considerDomains) {
-			Set<String> cAttributes = getAttributeNames(cTerm);
-			Set<String> tAttributes = getAttributeNames(tTerm);
-			if (cAttributes.equals(tAttributes)) {
-				return 1.0;
-			}
-			
-			return cosineSimilarity(cAttributes, tAttributes);
+		if (mode == ASMMode.TFIDF || mode == ASMMode.BASIC) {
+			return cosineSimilarity(getAttributeNames(cTerm), getAttributeNames(cTerm));
 		}
-		// for now takes average of attribute sizes
-//		double conf = (double) sharedAttributes.size() / ((cAttributes.size() + tAttributes.size()) / 2);
-		return 0;
+		
+		if (mode == ASMMode.PREREQS) {
+			return cosineSimilarity(
+					((EventClass) cTerm).getPrereqs(),
+					((EventClass) tTerm).getPrereqs());
+		}
+		
+		return attributesDomainSimilarity(cTerm, tTerm);
+
 	}
 
 	private Set<String> getAttributeNames(Term t) {
@@ -136,6 +152,9 @@ public class AttributeSetMatcher implements FirstLineMatcher {
 	
 	
 	private double cosineSimilarity(Set<String> attributes1, Set<String> attributes2) {
+		if (attributes1.equals(attributes2)) {
+			return 1.0;
+		}
 		double num = 0.0;
 		double denomA = 0.0;
 		double denomB = 0.0;
@@ -184,7 +203,7 @@ public class AttributeSetMatcher implements FirstLineMatcher {
 	}
 	
 	private double getIDF(String attributeName) {
-		if (!useTFIDF) {
+		if (mode == ASMMode.BASIC) {
 			return 1;
 		}
 		if (idfMap.containsKey(attributeName)) {
@@ -195,5 +214,27 @@ public class AttributeSetMatcher implements FirstLineMatcher {
 		idfMap.put(attributeName,  score);
 		return score;
 	}
+	
+	private double attributesDomainSimilarity(Term cTerm, Term tTerm) {
+		DomainAlgorithm domainAlgorithm = new DomainAlgorithm();
+		Set<String> cAttributes = getAttributeNames(cTerm);
+		Set<String> tAttributes = getAttributeNames(tTerm);
+		
+		double sum = 0;
+		for (Attribute attribute : cTerm.getAttributes()) {
+			if (tAttributes.contains(attribute.getName())) {
+				for (Attribute attribute2 : tTerm.getAttributes()) {
+					if (attribute2.getName().equals(attribute.getName())) {
+						double dist = domainAlgorithm.getDistance(attribute.getDomain(), attribute2.getDomain());
+						sum = sum + dist;
+					}
+				}
+			}
+		}
+		double conf = sum / (Math.sqrt(cAttributes.size()) * Math.sqrt(tAttributes.size()));
+		return conf;
+	}
+	
+
 
 }

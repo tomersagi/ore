@@ -31,7 +31,7 @@ public class ProcessInstanceMatcher implements FirstLineMatcher {
 	
 	@Override
 	public String getName() {
-		return "Process Instance Matcher " + mode;
+		return "Process Instance Matcher: " + mode;
 	}
 
 	@Override
@@ -61,6 +61,9 @@ public class ProcessInstanceMatcher implements FirstLineMatcher {
 				if (mode == PIMMode.TIME) {
 					conf = timeDistributionConfidence(cTerm, tTerm);
 				}
+				if (Double.isNaN(conf)) {
+					conf = 0;
+				}
 				res.updateMatch(tTerm, cTerm, conf);
 		
 			}
@@ -86,7 +89,7 @@ public class ProcessInstanceMatcher implements FirstLineMatcher {
 
 	@Override
 	public String getConfig() {
-		return "no configurable parameters";
+		return mode.toString();
 	}
 
 	@Override
@@ -102,12 +105,12 @@ public class ProcessInstanceMatcher implements FirstLineMatcher {
 	
 	private double positionConfidence(EventClass cTerm, EventClass tTerm) {
 //		return 1 - Math.abs(cTerm.getRelativePosition() - tTerm.getRelativePosition());		
-		double min = Math.min(cTerm.getRelativePosition(), tTerm.getRelativePosition());
-		double max = Math.max(cTerm.getRelativePosition(), tTerm.getRelativePosition());
-		if (max == 0.0) {
-			return 1;
-		}
-		return 1 - (max - min) / max;
+//		double min = Math.min(cTerm.getRelativePosition(), tTerm.getRelativePosition());
+//		double max = Math.max(cTerm.getRelativePosition(), tTerm.getRelativePosition());
+//		if (max == 0.0) {
+//			return 1;
+//		}
+		return 1 - Math.abs(cTerm.getRelativePosition() - tTerm.getRelativePosition());
 	}
 	
 	private double frequencyConfidence(EventClass cTerm, EventClass tTerm) {

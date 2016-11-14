@@ -40,24 +40,19 @@ public class AttributeSetMatcher implements FirstLineMatcher {
 	private int documentCount;
 	private Map<String, Double> idfMap;
 	ASMMode mode;
-	boolean matchPrereqs = false;
 	
 	
 	public AttributeSetMatcher(ASMMode mode) {
 		this.mode = mode;
 	}
 	
-	public AttributeSetMatcher(ASMMode mode, boolean matchPrereqs) {
-		this.mode = mode;
-		this.matchPrereqs = matchPrereqs;
-	}
-	
+
 	/* (non-Javadoc)
 	 * @see ac.technion.schemamatching.matchers.firstline.FirstLineMatcher#getName()
 	 */
 	@Override
 	public String getName() {
-		return "Attribute set matcher " + getConfig();
+		return "Attribute set matcher: " + getConfig();
 	}
 	
 	/* (non-Javadoc)
@@ -65,7 +60,7 @@ public class AttributeSetMatcher implements FirstLineMatcher {
 	 */
 	@Override
 	public String getConfig() {
-		return "tfidf: " + mode.toString();
+		return mode.toString();
 	}
 
 	/* (non-Javadoc)
@@ -127,19 +122,23 @@ public class AttributeSetMatcher implements FirstLineMatcher {
 	}
 	
 	private double computeConfidence(Term cTerm, Term tTerm) {
-		
+		double conf = 0;
 		if (mode == ASMMode.TFIDF || mode == ASMMode.BASIC) {
-			return cosineSimilarity(getAttributeNames(cTerm), getAttributeNames(cTerm));
+			conf = cosineSimilarity(getAttributeNames(cTerm), getAttributeNames(cTerm));
 		}
 		
 		if (mode == ASMMode.PREREQS) {
-			return cosineSimilarity(
+			conf = cosineSimilarity(
 					((EventClass) cTerm).getPrereqs(),
 					((EventClass) tTerm).getPrereqs());
 		}
-		
-		return attributesDomainSimilarity(cTerm, tTerm);
-
+		if (mode == ASMMode.DOMAIN) {
+			conf = attributesDomainSimilarity(cTerm, tTerm);
+		}
+		if (Double.isNaN(conf)) {
+			return 0;
+		}
+		return conf;
 	}
 
 	private Set<String> getAttributeNames(Term t) {
@@ -153,7 +152,7 @@ public class AttributeSetMatcher implements FirstLineMatcher {
 	
 	private double cosineSimilarity(Set<String> attributes1, Set<String> attributes2) {
 		if (attributes1.equals(attributes2)) {
-			return 1.0;
+ 			return 1.0;
 		}
 		double num = 0.0;
 		double denomA = 0.0;
@@ -181,22 +180,34 @@ public class AttributeSetMatcher implements FirstLineMatcher {
 		attributeDictionary = new HashMap<String, Integer>();
 		idfMap = new HashMap<String, Double>();
 		for (Term t : candidate.getTerms(true)) {
-			for (Attribute attr : t.getAttributes()) {
+			Set<String> attributes;
+			if (mode == ASMMode.TFIDF) {
+				attributes = getAttributeNames(t);
+			} else {
+				attributes = ((EventClass) t).getPrereqs();
+			}
+			for (String attr: attributes) {
 				int c = 0;
-				if (attributeDictionary.containsKey(attr.getName())) {
-					c = attributeDictionary.get(attr.getName());
+				if (attributeDictionary.containsKey(attr)) {
+					c = attributeDictionary.get(attr);
 				}
-				attributeDictionary.put(attr.getName(), c + 1);
+				attributeDictionary.put(attr, c + 1);
 				documentCount++;
 			}
 		}
 		for (Term t : target.getTerms(true)) {
-			for (Attribute attr : t.getAttributes()) {
+			Set<String> attributes;
+			if (mode == ASMMode.TFIDF) {
+				attributes = getAttributeNames(t);
+			} else {
+				attributes = ((EventClass) t).getPrereqs();
+			}
+			for (String attr: attributes) {
 				int c = 0;
-				if (attributeDictionary.containsKey(attr.getName())) {
-					c = attributeDictionary.get(attr.getName());
+				if (attributeDictionary.containsKey(attr)) {
+					c = attributeDictionary.get(attr);
 				}
-				attributeDictionary.put(attr.getName(), c + 1);
+				attributeDictionary.put(attr, c + 1);
 				documentCount++;
 			}
 		}

@@ -28,7 +28,6 @@ public class XESImporter implements Importer {
 	public static List<String> HIDE_ATTRIBUTES = Arrays.asList(
 			new String[]{"concept:name", "activityNameEN", "activityNameNL", "action_code"});
 	
-	public static boolean FILTER_SUBPROCESS = false;
 	
 	private Ontology ontology;
 	
@@ -42,6 +41,7 @@ public class XESImporter implements Importer {
 		//TODO: since we only have .XES files, for now these two will be the same
 		//TODO: if they also might not be the same, add some handler for that scenario
 		
+		
 		File file = modelFile;
 		ontology = new Ontology(file.getName().substring(0, file.getName().length()-4));
 		ontology.setLight(true);
@@ -51,7 +51,8 @@ public class XESImporter implements Importer {
 		createOntology(log);
 		
 		System.out.println("ontology created");
-		
+
+
 		return ontology;
 		
 	} 
@@ -64,14 +65,11 @@ public class XESImporter implements Importer {
 		ontology.addClass(eventClassClass);
 		
 		for (EventClass eventClass : model.getEventClasses()) {
-			if (FILTER_SUBPROCESS && 
-				!eventClass.getName().subSequence(0, 2).equals("12")) {
-				continue;
-			}
 			ontology.addTerm(eventClass);
 			
 			eventClass.setSuperClass(eventClassClass);
 			}
+		System.out.println("Eventclasses in log: " + ontology.getAllTermsCount());
 	}
 
 	private XLog importXLog(File file) throws ImportException {

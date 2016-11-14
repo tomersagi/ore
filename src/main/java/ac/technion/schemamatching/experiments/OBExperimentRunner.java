@@ -783,6 +783,9 @@ public class OBExperimentRunner {
 			
 			writer.writeNext(header);
 			for (String[] row : data) {
+				for (int i = 0; i < row.length; i++) {
+					row[i] = row[i].replace(".", ",");
+				}
 				writer.writeNext(row);
 			}
 			

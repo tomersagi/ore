@@ -136,6 +136,45 @@ public class VerboseBinaryGolden implements K2Statistic {
 	private String[] extraVerboseResult(String instanceDescription, Term cTerm, Term tTerm, double conf, String cat) {
 		EventClass cec = (EventClass) cTerm;
 		EventClass tec = (EventClass) tTerm;
+		if (instanceDescription.toLowerCase().contains("time")) {
+			return new String[] {instanceDescription
+					,Long.toString(cTerm.getId())
+					,cTerm.toStringVs2()
+					,Long.toString(tTerm.getId())
+					,tTerm.toStringVs2()
+					,Double.toString(conf).replace('.', ',')
+					,cat
+					,Double.toString(cec.getTimeDistribution().getMean()).replace('.', ',')
+					,Double.toString(cec.getTimeDistribution().getStandardDeviation()).replace('.', ',')
+					,Double.toString(tec.getTimeDistribution().getMean()).replace('.', ',')
+					,Double.toString(tec.getTimeDistribution().getStandardDeviation()).replace('.', ',')
+
+			};
+		}
+		if (instanceDescription.toLowerCase().contains("frequency")) {
+			return new String[] {instanceDescription
+					,Long.toString(cTerm.getId())
+					,cTerm.toStringVs2()
+					,Long.toString(tTerm.getId())
+					,tTerm.toStringVs2()
+					,Double.toString(conf).replace('.', ',')
+					,cat
+					,Double.toString(cec.getFrequency())
+					,Double.toString(tec.getFrequency())
+			};
+		}
+		if (instanceDescription.toLowerCase().contains("position")) {
+			return new String[] {instanceDescription
+					,Long.toString(cTerm.getId())
+					,cTerm.toStringVs2()
+					,Long.toString(tTerm.getId())
+					,tTerm.toStringVs2()
+					,Double.toString(conf).replace('.', ',')
+					,cat
+					,Double.toString(cec.getRelativePosition())
+					,Double.toString(tec.getRelativePosition())
+			};
+		}
 		return new String[] {instanceDescription
 				,Long.toString(cTerm.getId())
 				,cTerm.toStringVs2()
@@ -143,11 +182,6 @@ public class VerboseBinaryGolden implements K2Statistic {
 				,tTerm.toStringVs2()
 				,Double.toString(conf).replace('.', ',')
 				,cat
-				,Double.toString(cec.getTimeDistribution().getMean()).replace('.', ',')
-				,Double.toString(cec.getTimeDistribution().getStandardDeviation()).replace('.', ',')
-				,Double.toString(tec.getTimeDistribution().getMean()).replace('.', ',')
-				,Double.toString(tec.getTimeDistribution().getStandardDeviation()).replace('.', ',')
-		
 		};
 	}
 }

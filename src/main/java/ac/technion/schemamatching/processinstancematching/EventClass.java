@@ -89,16 +89,16 @@ public class EventClass extends Term {
 	
 	public void addPrereqs(Set<String> prereqs) {
 		allPrereqs.addAll(prereqs);
-		if (mandatoryPrereqs.isEmpty() && optionalPrereqs.isEmpty()) {
-			mandatoryPrereqs.addAll(prereqs);
-		} else {
-			Set<String> diff = new HashSet<String>(mandatoryPrereqs);
-			diff.removeAll(prereqs);
-			for (String attrName : diff) {
-				mandatoryPrereqs.remove(attrName);
-				optionalPrereqs.add(attrName);
-			}
-		}
+//		if (mandatoryPrereqs.isEmpty() && optionalPrereqs.isEmpty()) {
+//			mandatoryPrereqs.addAll(prereqs);
+//		} else {
+//			Set<String> diff = new HashSet<String>(mandatoryPrereqs);
+//			diff.removeAll(prereqs);
+//			for (String attrName : diff) {
+//				mandatoryPrereqs.remove(attrName);
+//				optionalPrereqs.add(attrName);
+//			}
+//		}
 	}
 	
 	public Set<String> getPrereqs() {

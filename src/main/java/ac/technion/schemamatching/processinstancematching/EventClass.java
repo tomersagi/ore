@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 import ac.technion.iem.ontobuilder.core.ontology.Attribute;
@@ -23,7 +24,7 @@ public class EventClass extends Term {
 	Set<String> mandatoryPrereqs;
 	Set<String> optionalPrereqs;
 	Set<String> allPrereqs;
-	SummaryStatistics timeDistrib;
+	DescriptiveStatistics timeDistrib;
 	Map<String, Attribute> attributeMap;
 	
 	public EventClass(String name) {
@@ -32,7 +33,7 @@ public class EventClass extends Term {
 		allPrereqs = new HashSet<String>();
 		mandatoryPrereqs = new HashSet<String>();
 		optionalPrereqs = new HashSet<String>();
-		timeDistrib = new SummaryStatistics();
+		timeDistrib = new DescriptiveStatistics();
 		attributeMap = new HashMap<String, Attribute>();
 		avgRelPos = -1;
 	}
@@ -53,7 +54,8 @@ public class EventClass extends Term {
 		timeDistrib.addValue(ms);
 	}
 	
-	public SummaryStatistics getTimeDistribution() {
+	public DescriptiveStatistics getTimeDistribution() {
+		
 		return timeDistrib;
 	}
 	

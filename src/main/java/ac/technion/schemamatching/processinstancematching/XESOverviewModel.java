@@ -60,7 +60,8 @@ public class XESOverviewModel {
 		
 		for (XAttribute attr : event.getAttributes().values()) {
 			String attrName = attr.getKey();
-			if (!hiddenAttributes.contains(attrName) && !attrName.startsWith("(case)")) {
+//			if (!hiddenAttributes.contains(attrName) && !attrName.startsWith("(case)")) {
+			if (!hiddenAttributes.contains(attrName)) {
 				Object val = XUtils.getAttributeValue(attr);
 				el.addAttributeValue(attrName, val);
 				currentPrereqs.add(attrName);

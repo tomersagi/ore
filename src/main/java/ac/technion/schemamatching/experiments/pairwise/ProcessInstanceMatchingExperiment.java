@@ -38,7 +38,6 @@ import ac.technion.schemamatching.testbed.ExperimentSchemaPair;
  */
 class ProcessInstanceMatchingExperiment implements PairWiseExperiment {
 	private ArrayList<FirstLineMatcher> flM;
-	//private ArrayList<SecondLineMatcher> slM;
 	private Properties properties;
 	private boolean isMemory;
 
@@ -138,10 +137,10 @@ class ProcessInstanceMatchingExperiment implements PairWiseExperiment {
 				//Second Line Match
 				MatchInformation mi1 = s.match(mi);
 				//calculate Precision and Recall
-				K2Statistic b2 = new BinaryGolden();
+//				K2Statistic b2 = new BinaryGolden();
 				String instanceDesc1 =  esp.getID() + "," + m.getName() + "," + s.getName()+ "," + s.getConfig();
-				b2.init(instanceDesc1, mi1,esp.getExact());
-				evaluations.add(b2);
+//				b2.init(instanceDesc1, mi1,esp.getExact());
+//				evaluations.add(b2);
 				//Calculate verbose binary
 				VerboseBinaryGolden b3 = new VerboseBinaryGolden();
 				instanceDesc1 =  esp.getID() + "," + m.getName() + "," + s.getName()+ "," + s.getConfig();
@@ -178,12 +177,9 @@ class ProcessInstanceMatchingExperiment implements PairWiseExperiment {
 			//selecting second line matchers to use
 			ArrayList<SecondLineMatcher> ensembleSLMs= new ArrayList<>();
 
-//			ensembleSLMs.add(SLMList.OBMWBG.getSLM());
-//			slm_to_use.add(SLMList.OBMaxDelta01.getSLM());
-//			slm_to_use.add(SLMList.OBThreshold085.getSLM());
-//			slm_to_use.addAll(new OBThreshold(0.95));
-//			slm_to_use.add(SLMList.OBDom.getSLM());
-//			slm_to_use.add(SLMList.OBSM.getSLM());
+			ensembleSLMs.add(SLMList.OBMWBG.getSLM());
+			ensembleSLMs.add(SLMList.OBMaxDelta005.getSLM());
+			ensembleSLMs.add(SLMList.OBMaxDelta01.getSLM());
 
 			for (SecondLineMatcher s : ensembleSLMs)
 			{

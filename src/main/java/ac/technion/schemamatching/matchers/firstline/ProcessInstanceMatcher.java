@@ -2,8 +2,8 @@ package ac.technion.schemamatching.matchers.firstline;
 
 import java.util.Vector;
 
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.apache.commons.math3.stat.inference.TTest;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.stat.inference.KolmogorovSmirnovTest;
 
 import ac.technion.iem.ontobuilder.core.ontology.Ontology;
 import ac.technion.iem.ontobuilder.core.ontology.Term;
@@ -45,7 +45,6 @@ public class ProcessInstanceMatcher implements FirstLineMatcher {
 		Vector<Term> targetTerms = target.getTerms(false);
 		MatchInformation res = new MatchInformation(candidate,target);
 
-//		double max = 0;
 		for (int i = 0; i < candidateTerms.size(); i++) {
 			EventClass cTerm = (EventClass) candidateTerms.get(i); 		
 			for (int j = 0; j < targetTerms.size(); j++) {
@@ -65,25 +64,8 @@ public class ProcessInstanceMatcher implements FirstLineMatcher {
 					conf = 0;
 				}
 				res.updateMatch(tTerm, cTerm, conf);
-		
 			}
 		}
-		
-//		for (int i=0; i<Math.min(candidateTerms.size(), targetTerms.size());i++) {
-//			res.updateMatch(targetTerms.get(i), candidateTerms.get(i), 1.0);
-//		candidate.removeTerm(candidate.getTerm(0));//new addition by Roee
-		
-		// we have to normalize this. Probably there is a cleaner way to do this
-//		if (mode == PIMMode.FREQUENCY) {
-//			for (int i = 0; i < candidateTerms.size(); i++) {
-//				EventClass cTerm = (EventClass) candidateTerms.get(i); 
-//				for (int j = 0; j < targetTerms.size(); j++) {
-//					EventClass tTerm = (EventClass) targetTerms.get(j);
-//					double newConf = 1 - (res.getMatchConfidence(cTerm, tTerm) / max);
-//					res.updateMatch(tTerm, cTerm, newConf);
-//				}
-//			}
-//		}
 		return res;
 	}
 
@@ -114,7 +96,6 @@ public class ProcessInstanceMatcher implements FirstLineMatcher {
 	}
 	
 	private double frequencyConfidence(EventClass cTerm, EventClass tTerm) {
-//		return Math.abs(cTerm.getFrequency() - tTerm.getFrequency());
 		double min = Math.min(cTerm.getFrequency(), tTerm.getFrequency());
 		double max = Math.max(cTerm.getFrequency(), tTerm.getFrequency());
 		if (max == 0.0) {
@@ -124,11 +105,27 @@ public class ProcessInstanceMatcher implements FirstLineMatcher {
 	}
 	
 	private double timeDistributionConfidence(EventClass cTerm, EventClass tTerm) {
-		TTest test = new TTest();
+//		KolmogorovSmirnovTest test = new KolmogorovSmirnovTest();
+//	
+//
+		DescriptiveStatistics cStats = cTerm.getTimeDistribution();
+		DescriptiveStatistics tStats = tTerm.getTimeDistribution();
+//		
+//		if (cStats.getN() < 2 || tStats.getN() < 2) {
+//			double min = Math.min(cStats.getMean(), tStats.getMean());
+//			double max = Math.max(cStats.getMean(), tStats.getMean());
+//			
+//			if (max == 0.0) {
+//				return 1;
+//			}
+//			return 1 - (max - min) / max;
+//		}
+//		
+//		double p = test.kolmogorovSmirnovTest(cStats.getValues(), tStats.getValues());
+//		
+//		return 1 - p;
 		
-		//TODO: for smaller sample sizes, this should return something else in general
-		SummaryStatistics cStats = cTerm.getTimeDistribution();
-		SummaryStatistics tStats = tTerm.getTimeDistribution();
+		
 		double min = Math.min(cStats.getMean(), tStats.getMean());
 		double max = Math.max(cStats.getMean(), tStats.getMean());
 		
@@ -136,11 +133,6 @@ public class ProcessInstanceMatcher implements FirstLineMatcher {
 			return 1;
 		}
 		return 1 - (max - min) / max;
-		
-//		if (cStats.getN() < 25 || tStats.getN() < 25) {
-//			return Math.min(cStats.getMean(), tStats.getMean()) / Math.max(cStats.getMean(), tStats.getMean()); 
-//		}
-//		double p = test.tTest(cTerm.getTimeDistribution(), tTerm.getTimeDistribution());
-//		return p;
+
 	}
 }

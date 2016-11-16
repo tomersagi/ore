@@ -26,7 +26,7 @@ import ac.technion.iem.ontobuilder.io.imports.Importer;
 public class XESImporter implements Importer {
 
 	public static List<String> HIDE_ATTRIBUTES = Arrays.asList(
-			new String[]{"concept:name", "activityNameEN", "activityNameNL", "action_code"});
+			new String[]{"concept:name", "activityNameEN", "activityNameNL", "action_code", "time:timestamp", "Resource"});
 	
 	
 	private Ontology ontology;

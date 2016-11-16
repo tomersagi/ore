@@ -97,6 +97,7 @@ public class AttributeSetMatcher implements FirstLineMatcher {
 		Vector<Term> targetTerms = target.getTerms(false);
 		MatchInformation mi = new MatchInformation(candidate,target);
 		
+		int done = 0;
 		for (int i = 0; i < candidateTerms.size(); i++) {
 			Term cTerm = candidateTerms.get(i); 
 			
@@ -104,7 +105,10 @@ public class AttributeSetMatcher implements FirstLineMatcher {
 				Term tTerm = targetTerms.get(j);
 				double conf = computeConfidence(cTerm, tTerm);
 				mi.updateMatch(tTerm, cTerm, conf);
-		
+				done++;
+				if (done % 25 == 0) {
+					System.out.println("Done: " + done + " of " + candidateTerms.size() * targetTerms.size());
+				}
 			}
 		}
 		return mi;
@@ -118,7 +122,7 @@ public class AttributeSetMatcher implements FirstLineMatcher {
 	 */
 	@Override
 	public int getDBid() {
-		return 250 + mode.value ;
+		return 250 + mode.value;
 	}
 	
 	private double computeConfidence(Term cTerm, Term tTerm) {

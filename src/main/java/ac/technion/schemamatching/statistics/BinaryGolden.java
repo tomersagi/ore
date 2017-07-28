@@ -67,11 +67,11 @@ public class BinaryGolden implements K2Statistic {
 		for (String match : matchListIds)
 		{
 			if (exactMatchListIds.contains(match)) {
-				System.err.println("found: " + match);
+//				System.err.println("found: " + match);
 				res+=1.0;
-			} else {
-				System.err.println("False positive: " + match);
-			}
+			} //else {
+//				System.err.println("False positive: " + match);
+			//}
 			
 		}
 		return res;

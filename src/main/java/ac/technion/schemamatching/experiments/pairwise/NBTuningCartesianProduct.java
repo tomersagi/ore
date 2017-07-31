@@ -14,11 +14,7 @@ import ac.technion.schemamatching.matchers.firstline.FirstLineMatcher;
 import ac.technion.schemamatching.matchers.firstline.OBTermMatch;
 import ac.technion.schemamatching.matchers.secondline.OBMaxDelta;
 import ac.technion.schemamatching.matchers.secondline.SecondLineMatcher;
-import ac.technion.schemamatching.statistics.BinaryGolden;
-import ac.technion.schemamatching.statistics.K2Statistic;
-import ac.technion.schemamatching.statistics.MatchDistance;
-import ac.technion.schemamatching.statistics.NBGolden;
-import ac.technion.schemamatching.statistics.Statistic;
+import ac.technion.schemamatching.statistics.*;
 import ac.technion.schemamatching.testbed.ExperimentSchemaPair;
 
 /**
@@ -41,7 +37,7 @@ public class NBTuningCartesianProduct implements PairWiseExperiment {
 		
 		List<Statistic> stats = new ArrayList<>();
 		//generate cartesian product of configurations
-		double bin[] = new double[] {0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0};
+		double bin[] = new double[] {0.0,0.2,0.4,0.6,0.8,1.0};
 		boolean[] bbin = new boolean[]{true,false}; 
 		
 		int i=0;
@@ -64,14 +60,18 @@ public class NBTuningCartesianProduct implements PairWiseExperiment {
 									MatchInformation mi = ta.match(c, t, false);
 									long duration = System.currentTimeMillis()-start;
 									System.err.println("Completed" + i + " in " + duration);
-									String instanceDesc = "" + nGramWeight + "," + jaroWinklerWeight + "," + wordNameWeight + "," + 
+									String instanceDesc = "" + esp.getID() + "," + nGramWeight + "," + jaroWinklerWeight + "," + wordNameWeight + "," +
 									wordLabelWeight + "," + useSoundex + "," + useAvg + "," + nGram; 
 //									//count and output number of generated configurations
 									i++;
 									K2Statistic nbStat = new NBGolden();
 									nbStat.init(instanceDesc, mi, esp.getExact());
 									stats.add(nbStat);
-									
+
+									K2Statistic nbStatK = new NBGoldenAtK();
+									nbStatK.init(instanceDesc, mi, esp.getExact());
+									stats.add(nbStatK);
+
 									K2Statistic md = new MatchDistance();
 									md.init(instanceDesc, mi, esp.getExact());
 									stats.add(nbStat);

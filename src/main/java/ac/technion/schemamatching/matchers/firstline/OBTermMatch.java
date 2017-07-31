@@ -93,6 +93,7 @@ public class OBTermMatch implements FirstLineMatcher {
 	
 	public OBTermMatch() {
 		try {
+
 			ta = (TermAlgorithm)AlgorithmUtilities.getAlgorithmsInstance(new File(OntoBuilderResources.Config.Matching.ALGORITHMS_XML),MatchingAlgorithmsNamesEnum.TERM.getName());
 		} catch (AlgorithmException e) {
 			e.printStackTrace();

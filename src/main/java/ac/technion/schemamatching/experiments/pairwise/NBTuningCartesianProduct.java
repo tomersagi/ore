@@ -74,7 +74,7 @@ public class NBTuningCartesianProduct implements PairWiseExperiment {
 	
 									K2Statistic md = new MatchDistance();
 									md.init(instanceDesc, mi, esp.getExact());
-									stats.add(nbStat);
+									stats.add(md);
 									
 									//apply 2LM and calculate Binary stats
 									OBMaxDelta maxDelta = new OBMaxDelta(0.1);

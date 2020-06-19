@@ -19,5 +19,3 @@ Roee by email:shraga89@campus.technion.ac.il
 
 
 ### For more information Go to: [ORE Wiki](https://bitbucket.org/tomers77/ontobuilder-research-environment/wiki/Home) ###
-
-a change by or yagol

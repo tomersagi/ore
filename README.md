@@ -1,6 +1,5 @@
 ### Welcome to the Ontobuilder Research Environment! ###
 
-SiwarAbom!
 ![about.gif](https://bitbucket.org/repo/n9GKe/images/3183918637-about.gif)
 
 

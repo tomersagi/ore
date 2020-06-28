@@ -2,6 +2,7 @@
 
 ![about.gif](https://bitbucket.org/repo/n9GKe/images/3183918637-about.gif)
 
+Shelly Goldenshteen
 
 The Ontobuilder Research Environment (ORE) is designed to provide students and researchers in schema matching and related fields a jump-start in designing and running experiments. 
 

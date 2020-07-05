@@ -146,11 +146,11 @@
 <!--             <scope>system</scope> -->
 <!--     		<systemPath>${project.basedir}/lib/jbpt-bp.jar</systemPath> -->
 <!--         </dependency> -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>19.0</version>
-        </dependency>
+	<dependency>
+	  <groupId>com.google.guava</groupId>
+	  <artifactId>guava</artifactId>
+	  <version>[24.1.1,)</version>
+	</dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-math3</artifactId>

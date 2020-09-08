@@ -172,11 +172,11 @@
 <!--             <scope>system</scope> -->
 <!--     		<systemPath>${project.basedir}/lib/jbpt-bp.jar</systemPath> -->
 <!--         </dependency> -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>19.0</version>
-        </dependency>
+	<dependency>
+	  <groupId>com.google.guava</groupId>
+	  <artifactId>guava</artifactId>
+	  <version>[24.1.1,)</version>
+	</dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-math3</artifactId>
@@ -216,7 +216,7 @@
         <dependency>
     		<groupId>mysql</groupId>
    		    <artifactId>mysql-connector-java</artifactId>
-    		<version>5.1.10</version>
+    		<version>8.0.16</version>
 		</dependency>
 	<dependency>
 		<groupId>org.deckfour</groupId>

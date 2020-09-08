@@ -8,19 +8,16 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedList;
-import java.io.PrintStream;
 import java.io.StringReader;
 import java.util.Vector;
 import java.util.ArrayList;
 
-import javafx.util.Pair;
 import ac.technion.iem.ontobuilder.core.ontology.Ontology;
 import ac.technion.iem.ontobuilder.core.ontology.Term;
-import ac.technion.iem.ontobuilder.core.ontology.Attribute;
 import ac.technion.iem.ontobuilder.matching.match.MatchInformation;
-//import ac.technion.schemamatching.curpos.CurposTerm;
 import ac.technion.schemamatching.matchers.MatcherType;
 import ac.technion.schemamatching.matchers.firstline.MaximalCliquesWithPivot.Vertex;
+import jdk.internal.vm.compiler.collections.Pair;
 
 
 /**
@@ -38,11 +35,11 @@ public class Stat implements FirstLineMatcher {
 	 */
 	private class Concept extends HashSet<Integer> {
 		public double alpha;
-		public HashMap<Integer,Double> betas = new HashMap<Integer,Double>();
+		public HashMap<Integer,Double> betas = new HashMap<>();
 	};
 
 	private class Model extends ArrayList<Concept> {
-		public ArrayList<Double> alphas = new ArrayList<Double>();
+		public ArrayList<Double> alphas = new ArrayList<>();
 		double dsqure = 0;
 		int degreesOfFreedom = 0;
 		double chiprob = 0;
@@ -63,16 +60,16 @@ public class Stat implements FirstLineMatcher {
 	{
 		public Schema(){}
 		
-		public HashMap<Long,Integer> OREToProcessedID = new HashMap<Long,Integer>();
-		public HashMap<Long, String> OREIDName = new HashMap<Long, String>();
+		public HashMap<Long,Integer> OREToProcessedID = new HashMap<>();
+		public HashMap<Long, String> OREIDName = new HashMap<>();
 	}
 	
-	private ArrayList<Schema> processedSchemas = new ArrayList<Schema>();
+	private ArrayList<Schema> processedSchemas = new ArrayList<>();
 	private Vocabulary V = new Vocabulary();
-	private HashMap<Integer, String> dict = new HashMap<Integer, String>();
-	private HashSet<Concept> allConcepts = new HashSet<Concept>();
-	private HashSet<Model> models = new HashSet<Model>();
-	private HashMap<Integer,Integer> countIDs = new HashMap<Integer, Integer>();
+	private HashMap<Integer, String> dict = new HashMap<>();
+	private HashSet<Concept> allConcepts = new HashSet<>();
+	private HashSet<Model> models = new HashSet<>();
+	private HashMap<Integer,Integer> countIDs = new HashMap<>();
 	private ArrayList<Integer> connAtter = new ArrayList<>(); 
 	private Integer numOfSchemas = 0;
 	
@@ -85,8 +82,8 @@ public class Stat implements FirstLineMatcher {
 
 	
 	//for multiple ontologies implemntation
-	private HashMap<Schema,Ontology> schemaToOntologyMap = new HashMap<Schema,Ontology>();
-	private HashMap<Pair<Ontology,Ontology>,MatchInformation> res = new HashMap<Pair<Ontology,Ontology>,MatchInformation>();
+	private HashMap<Schema,Ontology> schemaToOntologyMap = new HashMap<>();
+	private HashMap<Pair<Ontology,Ontology>,MatchInformation> res = new HashMap<>();
 	
 	// private ArrayList<ArrayList<Vertex>> legalCliques = new
 	// ArrayList<ArrayList<Vertex>>();
@@ -149,7 +146,7 @@ public class Stat implements FirstLineMatcher {
 			boolean binary) {
 		//res = new MatchInformation(candidate, target);
 		
-		ArrayList<Ontology> schemaSet = new ArrayList<Ontology>();
+		ArrayList<Ontology> schemaSet = new ArrayList<>();
 		Ontology[] ontoArray = new Ontology[2];
 		
 		
@@ -170,7 +167,7 @@ public class Stat implements FirstLineMatcher {
 		
 		HashMap<Pair<Ontology,Ontology>,MatchInformation> result=match(schemaSet, binary);
 		
-		Pair<Ontology, Ontology> key = new Pair<Ontology, Ontology>(target, candidate);
+		Pair<Ontology, Ontology> key = Pair.create(target, candidate);
 		System.out.println(result.get(key).getCopyOfMatches());
 		return result.get(key);
 		
@@ -238,7 +235,7 @@ public class Stat implements FirstLineMatcher {
 		//numOfSchemas = schemaSet.length;
 		numOfSchemas = schemaSet.size();
 		
-		HashMap<String,Integer> stringIDs = new HashMap<String, Integer>();
+		HashMap<String,Integer> stringIDs = new HashMap<>();
 		for (Ontology currentOntology : schemaSet) 
 		{
 			for(Ontology otherOntology: schemaSet)
@@ -247,9 +244,9 @@ public class Stat implements FirstLineMatcher {
 				{
 					continue;
 				}
-				Pair<Ontology, Ontology> key = new Pair<Ontology, Ontology>(currentOntology, otherOntology);
-				Pair<Ontology, Ontology> reverseKey = new Pair<Ontology, Ontology>(otherOntology, currentOntology );
-				if (res.keySet().contains(key) || res.keySet().contains(reverseKey))
+				Pair<Ontology, Ontology> key = Pair.create(currentOntology, otherOntology);
+				Pair<Ontology, Ontology> reverseKey = Pair.create(otherOntology, currentOntology );
+				if (res.containsKey(key) || res.containsKey(reverseKey))
 				{
 					continue;
 				}
@@ -289,7 +286,7 @@ public class Stat implements FirstLineMatcher {
 		
 		for(String str : stringIDs.keySet())
 		{
-			HashSet<String> matchedStrings = new HashSet<String>();
+			HashSet<String> matchedStrings = new HashSet<>();
 			for(String other : stringIDs.keySet())
 			{
 				//threshold is 1
@@ -540,7 +537,7 @@ public class Stat implements FirstLineMatcher {
 				}
 				else
 				{
-					LinkedList<Long> list = new LinkedList<Long>();
+					LinkedList<Long> list = new LinkedList<>();
 					list.add(OREID);
 					V.ProcessedToOREID.put(ID, list);
 				}
@@ -566,7 +563,7 @@ public class Stat implements FirstLineMatcher {
 	
 	private void buildC() 
 	{
-		HashSet<Integer> vertexesSet = new HashSet<Integer>();
+		HashSet<Integer> vertexesSet = new HashSet<>();
 		//build a graph which represents the relations betwwen each attribute in the schema
 		//an edge will be added between two vertexes if the are foreign to each other
 		String graph = buildGraph(vertexesSet);
@@ -611,7 +608,7 @@ public class Stat implements FirstLineMatcher {
 	 */
 	private ArrayList<ArrayList<Vertex>> findCliques(String graph, HashSet<Integer> vertexesSet) {
 		BufferedReader bufReader = null;
-		ArrayList<ArrayList<Vertex>> maxCliques = new ArrayList<ArrayList<Vertex>>();
+		ArrayList<ArrayList<Vertex>> maxCliques = new ArrayList<>();
 		bufReader = new BufferedReader(new StringReader(graph));
 		
 		MaximalCliquesWithPivot ff = new MaximalCliquesWithPivot();
@@ -770,12 +767,12 @@ public class Stat implements FirstLineMatcher {
 
 	//template to get subsets of given set
 	private <T> ArrayList<ArrayList<T>> getSubsets(ArrayList<T> set) {
-		ArrayList<ArrayList<T>> subsetCollection = new ArrayList<ArrayList<T>>();
+		ArrayList<ArrayList<T>> subsetCollection = new ArrayList<>();
 
 		if (set.size() == 0) {
-			subsetCollection.add(new ArrayList<T>());
+			subsetCollection.add(new ArrayList<>());
 		} else {
-			ArrayList<T> reducedSet = new ArrayList<T>();
+			ArrayList<T> reducedSet = new ArrayList<>();
 
 			reducedSet.addAll(set);
 
@@ -801,13 +798,13 @@ public class Stat implements FirstLineMatcher {
  */
 private HashSet<Model> getNonIntersectingModels(HashSet<Concept> concepts){
 		
-		HashSet<Model> modelsCollection = new HashSet<Model>();
+		HashSet<Model> modelsCollection = new HashSet<>();
 		Model emptySet = new Model();
 
 		modelsCollection.add(emptySet);
 								
 		//make a set from each object T in the input set
-		HashSet<Model> modelsFromInput = new HashSet<Model>();
+		HashSet<Model> modelsFromInput = new HashSet<>();
 		for(Concept c : concepts){
 			if(c.size()!=0){
 				Model localModel = new Model();
@@ -816,10 +813,10 @@ private HashSet<Model> getNonIntersectingModels(HashSet<Concept> concepts){
 			}									
 		}
 		
-		HashSet<Model> legalCollection = new HashSet<Model>();
+		HashSet<Model> legalCollection = new HashSet<>();
 		long i = 0;
 		for (Model localModel : modelsFromInput){
-			HashSet<Model> modelsCollectionCopy = new HashSet<Model>();
+			HashSet<Model> modelsCollectionCopy = new HashSet<>();
 			modelsCollectionCopy.addAll(modelsCollection);
 			Model emptyModel = new Model();
 			modelsCollectionCopy.add(emptyModel);
@@ -856,8 +853,8 @@ private HashSet<Model> getNonIntersectingModels(HashSet<Concept> concepts){
  */
 private HashSet<Model> setCover(HashSet<Concept> concepts){
 
-	HashSet<Model> mContainer = new HashSet<Model>();
-	HashSet<Concept> maximalSizeConceptContainer = new HashSet<Concept>();
+	HashSet<Model> mContainer = new HashSet<>();
+	HashSet<Concept> maximalSizeConceptContainer = new HashSet<>();
 	//check for maximal sized concepts
 	int maxSize = 0;
 	for(Concept c: concepts){
@@ -872,9 +869,9 @@ private HashSet<Model> setCover(HashSet<Concept> concepts){
 	}
 	for(Concept c: maximalSizeConceptContainer){
 		Model m = new Model();
-		HashSet<Concept> U = new HashSet<Concept>();
+		HashSet<Concept> U = new HashSet<>();
 		U.addAll(concepts);
-		HashSet<Integer> vValues = new HashSet<Integer>();
+		HashSet<Integer> vValues = new HashSet<>();
 		vValues.addAll(V.ProcessedToOREID.keySet());
 		m.add(c);
 		//remove current maxmial sized concept from U - the input set
@@ -982,8 +979,8 @@ private HashSet<Model> setCover(HashSet<Concept> concepts){
 				m.alphas.add(c.alpha);			
 			}
 			// do some veriations of the data structures so chi2 test can be executed properly
-			ArrayList<Concept> LessThanOne = new ArrayList<Concept>();
-			ArrayList<Concept> EqualsOne = new ArrayList<Concept>();
+			ArrayList<Concept> LessThanOne = new ArrayList<>();
+			ArrayList<Concept> EqualsOne = new ArrayList<>();
 			for(Concept c : m){
 				if(c.alpha==1){
 					EqualsOne.add(c);
@@ -992,7 +989,7 @@ private HashSet<Model> setCover(HashSet<Concept> concepts){
 					LessThanOne.add(c);
 				}
 			}
-			ArrayList<HashSet<HashSet<Integer>>> setsList = new ArrayList<HashSet<HashSet<Integer>>>();
+			ArrayList<HashSet<HashSet<Integer>>> setsList = new ArrayList<>();
 			for (Concept c:EqualsOne)
 			{
 				setsList.add(setFromConcept(c, false));
@@ -1118,7 +1115,7 @@ private HashSet<Model> setCover(HashSet<Concept> concepts){
 				continue;
 			}
 			else{
-				HashMap<Integer, ArrayList<Schema>> schemaMappedByLocalID = new HashMap<Integer, ArrayList<Schema>>();
+				HashMap<Integer, ArrayList<Schema>> schemaMappedByLocalID = new HashMap<>();
 				for(Integer i: c)
 				{
 					for (Schema s : processedSchemas)
@@ -1127,7 +1124,7 @@ private HashSet<Model> setCover(HashSet<Concept> concepts){
 						{
 							if (schemaMappedByLocalID.get(i) == null)
 							{
-								ArrayList<Schema> schemaList = new ArrayList<Schema>();
+								ArrayList<Schema> schemaList = new ArrayList<>();
 								schemaList.add(s);
 								schemaMappedByLocalID.put(i, schemaList);
 							}
@@ -1241,14 +1238,14 @@ private HashSet<Model> setCover(HashSet<Concept> concepts){
 	
 	//auxilary function 
 	private HashSet<HashSet<Integer>> setFromConcept(Concept c, boolean addEmptySet){
-		HashSet<HashSet<Integer>> setOfSets = new HashSet<HashSet<Integer>>();
+		HashSet<HashSet<Integer>> setOfSets = new HashSet<>();
 		for(int i: c){
-			HashSet<Integer> newSet = new HashSet<Integer>();
+			HashSet<Integer> newSet = new HashSet<>();
 			newSet.add(i);
 			setOfSets.add(newSet);
 		}
 		if(addEmptySet==true){
-			HashSet<Integer> newSet = new HashSet<Integer>();
+			HashSet<Integer> newSet = new HashSet<>();
 			setOfSets.add(newSet);
 		}
 		return setOfSets;
@@ -1256,12 +1253,12 @@ private HashSet<Model> setCover(HashSet<Concept> concepts){
 	
 	private HashSet<HashSet<Integer>> CartesianProduct(HashSet<HashSet<Integer>> groupA, HashSet<HashSet<Integer>> groupB)
 	{
-		HashSet<HashSet<Integer>> newGroups= new HashSet<HashSet<Integer>>();
+		HashSet<HashSet<Integer>> newGroups= new HashSet<>();
 		for (HashSet<Integer> set: groupA)
 		{
 			for (HashSet<Integer> otherSet: groupB)
 			{
-				HashSet<Integer> newSet = new HashSet<Integer>();
+				HashSet<Integer> newSet = new HashSet<>();
 				newSet.addAll(set);
 				newSet.addAll(otherSet);
 				newGroups.add(newSet);
@@ -1276,7 +1273,7 @@ private HashSet<Model> setCover(HashSet<Concept> concepts){
 	private void CartesianProduct(ArrayList<HashSet<HashSet<Integer>>> setsList, Model m)
 	{
 		int index=0;
-		HashSet<Integer> res=new HashSet<Integer>();
+		HashSet<Integer> res= new HashSet<>();
 		_CartesianProduct(setsList,index,res,m);
 	}
 	
@@ -1380,10 +1377,10 @@ private HashSet<Model> setCover(HashSet<Concept> concepts){
 			}
 		}*/
 		
-		Pair<Ontology, Ontology> key =  new Pair<Ontology, Ontology>(currentOntology, otherOntology);
-		Pair<Ontology, Ontology> reverseKey = new Pair<Ontology, Ontology>(otherOntology, currentOntology );
+		Pair<Ontology, Ontology> key =  Pair.create(currentOntology, otherOntology);
+		Pair<Ontology, Ontology> reverseKey = Pair.create(otherOntology, currentOntology );
 		
-		if (res.keySet().contains(key))
+		if (res.containsKey(key))
 		{
 			res.get(key).updateMatch(currentTerm, otherTerm, 1.0);
 		}
